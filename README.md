@@ -43,7 +43,7 @@ source venv/bin/activate
 
 3. Встановіть залежності:
 ```bash
-pip install -r requirements.txt
+pip install django pillow django-crispy-forms crispy-bootstrap5 django-allauth
 ```
 
 4. Виконайте міграції:
@@ -52,17 +52,22 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-5. Створіть суперкористувача:
+5. Виконайте збір статичних файлів
+```bash
+python manage.py collectstatic
+```
+
+6. Створіть суперкористувача:
 ```bash
 python manage.py createsuperuser
 ```
 
-6. Запустіть сервер:
+7. Запустіть сервер:
 ```bash
 python manage.py runserver
 ```
 
-7. Відкрийте http://127.0.0.1:8000/ у браузері
+8. Відкрийте http://127.0.0.1:8000/ у браузері
 
 ## 📁 Структура проєкту
 
