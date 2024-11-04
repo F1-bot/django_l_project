@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Оформлення замовлення - Космічні Мавпочки{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+   <h1 class="gradient-title mb-4">Підтвердити замовлення</h1>
+
+   <div class="row">
+       <div class="col-lg-8">
+           <div class="checkout-container">
+
+               <div class="checkout-progress mb-5">
+                   <div class="progress-step active">
+                       <div class="step-icon">
+                           <i class="fas fa-shopping-cart"></i>
+                       </div>
+                       <div class="step-label">Кошик</div>
+                   </div>
+                   <div class="progress-line active"></div>
+                   <div class="progress-step active">
+                       <div class="step-icon">
+                           <i class="fas fa-address-card"></i>
+                       </div>
+                       <div class="step-label">Оформлення</div>
+                   </div>
+                   <div class="progress-line"></div>
+                   <div class="progress-step">
+                       <div class="step-icon">
+                           <i class="fas fa-check"></i>
+                       </div>
+                       <div class="step-label">Готово</div>
+                   </div>
+               </div>
+
+               <form method="post" id="checkout-form" class="needs-validation" novalidate>
+                   {% csrf_token %}
+
+                   <div class="card mb-4 checkout-card">
+                       <div class="card-header">
+                           <h5 class="mb-0">
+                               <i class="fas fa-user me-2"></i>Персональні дані
+                           </h5>
+                       </div>
+                       <div class="card-body">
+                           <div class="row">
+                               <div class="col-md-6 mb-3">
+                                   {{ form.first_name|as_crispy_field }}
+                               </div>
+                               <div class="col-md-6 mb-3">
+                                   {{ form.last_name|as_crispy_field }}
+                               </div>
+                           </div>
+                           <div class="mb-3">
+                               {{ form.email|as_crispy_field }}
+                           </div>
+                           <div class="mb-3">
+                               {{ form.phone|as_crispy_field }}
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="card mb-4 checkout-card">
+                       <div class="card-header">
+                           <h5 class="mb-0">
+                               <i class="fas fa-map-marker-alt me-2"></i>Адреса доставки
+                           </h5>
+                       </div>
+                       <div class="card-body">
+                           <div class="mb-3">
+                               {{ form.address|as_crispy_field }}
+                           </div>
+                           <div class="row">
+                               <div class="col-md-6 mb-3">
+                                   {{ form.city|as_crispy_field }}
+                               </div>
+                               <div class="col-md-6 mb-3">
+                                   {{ form.postal_code|as_crispy_field }}
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-credit-card me-2"></i>Спосіб оплати
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="payment-methods">
+                                <div class="form-check payment-method">
+                                    <input class="form-check-input" type="radio"
+                                           name="payment_method" id="crypto"
+                                           value="crypto" checked>
+                                    <label class="form-check-label" for="crypto">
+                                        <i class="fab fa-ethereum me-2"></i>
+                                        Криптовалюта (ETH)
+                                    </label>
+                                </div>
+                                <div class="form-check payment-method">
+                                    <input class="form-check-input" type="radio"
+                                           name="payment_method" id="card"
+                                           value="card">
+                                    <label class="form-check-label" for="card">
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Банківська карта
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="crypto-form" class="payment-form">
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Після підтвердження замовлення ви отримаєте адресу
+                                    гаманця для здійснення оплати.
+                                </div>
+                            </div>
+
+                            <div id="card-form" class="payment-form d-none">
+                                <div class="mt-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Номер карти</label>
+                                        <input type="text" class="form-control"
+                                               placeholder="1234 5678 9012 3456">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Термін дії</label>
+                                            <input type="text" class="form-control"
+                                                   placeholder="MM/YY">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">CVV</label>
+                                            <input type="text" class="form-control"
+                                                   placeholder="123">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   <button type="submit" class="btn btn-primary btn-lg w-100 submit-btn mb-4">
+                       <i class="fas fa-check me-2"></i>Підтвердити замовлення
+                   </button>
+               </form>
+           </div>
+       </div>
+
+       <div class="col-lg-4">
+           <div class="card order-summary">
+               <div class="card-header bg-primary text-white">
+                   <h5 class="mb-0">
+                       <i class="fas fa-shopping-bag me-2"></i>Ваше замовлення
+                   </h5>
+               </div>
+               <div class="card-body">
+                   {% for item in cart_items %}
+                       <div class="order-item mb-3">
+                           <div class="d-flex align-items-center">
+                               <div class="order-item-image me-3">
+                                   <img src="{{ item.monkey.image.url }}"
+                                        alt="{{ item.monkey.name }}"
+                                        class="img-fluid rounded shadow-sm">
+                               </div>
+                               <div class="order-item-details flex-grow-1">
+                                   <h6 class="mb-2">{{ item.monkey.name }}</h6>
+                                   <div class="d-flex justify-content-between align-items-center">
+                                       <div class="quantity-info">
+                                           <span class="text-muted me-2">Кількість:</span>
+                                           <span class="fw-medium">{{ item.quantity }}</span>
+                                       </div>
+                                       <span class="price fw-bold">{{ item.monkey.price }} ETH</span>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   {% endfor %}
+
+                   <hr class="my-4">
+
+                   <div class="price-summary">
+                       <div class="d-flex justify-content-between mb-2">
+                           <span>Підсумок:</span>
+                           <span class="fw-bold">{{ subtotal }} ETH</span>
+                       </div>
+                       <div class="d-flex justify-content-between mb-2">
+                           <span>Комісія:</span>
+                           <span class="text-muted">{{ fee }} ETH</span>
+                       </div>
+                       <hr class="my-3">
+                       <div class="d-flex justify-content-between total">
+                           <strong class="h5 mb-0">Загальна сума:</strong>
+                           <strong class="h5 mb-0 text-primary">{{ total }} ETH</strong>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.gradient-title {
+    background: linear-gradient(90deg, #6f42c1, #007bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    text-align: center;
+    margin: 2rem 0;
+    padding: 1rem 0;
+}
+
+.checkout-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-icon {
+    background: #6f42c1;
+    color: white;
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 1rem;
+}
+
+.progress-line.active {
+    background: #6f42c1;
+}
+
+.checkout-container {
+    animation: slideIn 0.5s ease-out;
+    margin-bottom: 2rem;
+}
+
+.checkout-card, .order-summary {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.order-summary {
+    position: sticky;
+    top: 20px;
+    margin-top: 1.5rem;
+}
+
+.order-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.order-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.order-item-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.order-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.payment-method {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.payment-method:hover {
+    border-color: #6f42c1;
+    background-color: rgba(111, 66, 193, 0.05);
+}
+
+.payment-method input:checked + label {
+    color: #6f42c1;
+}
+
+.price-summary {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.total-price {
+    color: #6f42c1;
+    font-size: 1.25rem;
+}
+
+.quantity-info {
+    background: #e9ecef;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.submit-btn {
+    background: linear-gradient(90deg, #6f42c1, #007bff);
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(111,66,193,0.3);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .gradient-title {
+        font-size: 1.5rem;
+        margin: 1rem 0;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .step-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .step-label {
+        font-size: 0.8rem;
+    }
+
+    .order-summary {
+        margin-top: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}

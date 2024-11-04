@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Кошик - Космічні Мавпочки{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Кошик</h1>
+
+    {% if cart_items %}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="cart-items">
+                    {% for item in cart_items %}
+                        <div class="card mb-3 cart-item" data-item-id="{{ item.id }}">
+                            <div class="row g-0">
+                                <div class="col-md-3">
+                                    <img src="{{ item.monkey.image.url }}"
+                                         class="img-fluid rounded-start"
+                                         alt="{{ item.monkey.name }}">
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="card-title">{{ item.monkey.name }}</h5>
+                                            <span class="badge bg-{{ item.monkey.rarity }}">
+                                                {{ item.monkey.get_rarity_display }}
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted">
+                                            {{ item.monkey.description|truncatewords:20 }}
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="quantity-controls">
+                                                <button class="btn btn-outline-secondary btn-sm"
+                                                        onclick="updateCartQuantity({{ item.id }}, -1)">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <span class="mx-2" id="quantity-{{ item.id }}">
+                                                    {{ item.quantity }}
+                                                </span>
+                                                <button class="btn btn-outline-secondary btn-sm"
+                                                        onclick="updateCartQuantity({{ item.id }}, 1)">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                            <div class="price" id="price-{{ item.id }}">
+                                                {{ item.get_subtotal }} ETH
+                                            </div>
+                                            <button class="btn btn-danger btn-sm"
+                                                    onclick="removeFromCart({{ item.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card cart-summary">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Підсумок замовлення</h5>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Кількість товарів:</span>
+                            <span id="total-quantity">{{ total_quantity }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Підсумок:</span>
+                            <span id="subtotal">{{ subtotal }} ETH</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Комісія:</span>
+                            <span id="fee">{{ fee }} ETH</span>
+                        </div>
+                        <div class="d-flex justify-content-between total">
+                            <strong>Загальна сума:</strong>
+                            <strong id="total" class="total-price">{{ total }} ETH</strong>
+                        </div>
+                        <a href="{% url 'checkout' %}" class="btn btn-primary w-100 mt-3">
+                            Оформити замовлення
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <img src="{% static 'images/empty-cart.svg' %}"
+                 alt="Empty Cart"
+                 class="mb-4"
+                 style="max-width: 200px;">
+            <h3>Ваш кошик порожній</h3>
+            <p class="text-muted">Час додати кілька космічних мавпочок!</p>
+            <a href="{% url 'home' %}" class="btn btn-primary">
+                Повернутися до покупок
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateCartQuantity(itemId, change) {
+    fetch(`/cart/update/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ change: change })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`quantity-${itemId}`).textContent = data.quantity;
+            document.getElementById(`price-${itemId}`).textContent = `${data.item_subtotal.toFixed(2)} ETH`;
+            document.getElementById('total-quantity').textContent = data.total_quantity;
+            document.getElementById('subtotal').textContent = `${data.subtotal.toFixed(2)} ETH`;
+            document.getElementById('fee').textContent = `${data.fee.toFixed(2)} ETH`;
+            document.getElementById('total').textContent = `${data.total.toFixed(2)} ETH`;
+        } else {
+            alert(data.message || 'Помилка оновлення кількості');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Помилка оновлення кількості');
+    });
+}
+
+function removeFromCart(itemId) {
+    if (confirm('Ви впевнені, що хочете видалити цей товар?')) {
+        fetch(`/cart/remove/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const item = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+                item.remove();
+
+                document.getElementById('total-quantity').textContent = data.total_quantity;
+                document.getElementById('subtotal').textContent = `${data.subtotal.toFixed(2)} ETH`;
+                document.getElementById('fee').textContent = `${data.fee.toFixed(2)} ETH`;
+                document.getElementById('total').textContent = `${data.total.toFixed(2)} ETH`;
+
+                if (data.total_quantity === 0) {
+                    location.reload();
+                }
+            } else {
+                alert(data.message || 'Помилка видалення товару');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Помилка видалення товару');
+        });
+    }
+}
+</script>
+{% endblock extra_js %}
+
+<style>
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.cart-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cart-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.cart-summary {
+    position: sticky;
+    top: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 20px;
+    padding: 5px 10px;
+}
+
+.quantity-controls button {
+    border: none;
+    background: none;
+    color: #6f42c1;
+}
+
+.quantity-controls button:hover {
+    color: #007bff;
+}
+
+.cart-summary .total-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #6f42c1;
+}
+
+.empty-cart-container {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.empty-cart-container img {
+    max-width: 200px;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}

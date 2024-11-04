@@ -1,0 +1,173 @@
+/* Градієнтний текст */
+.text-gradient {
+    background: linear-gradient(45deg, #6f42c1, #007bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Анімація floating для героя */
+.floating {
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Фонові фігури */
+.hero-bg-shapes .shape-1 {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(111,66,193,0.2) 0%, rgba(111,66,193,0) 70%);
+    border-radius: 50%;
+}
+
+.hero-bg-shapes .shape-2 {
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0,123,255,0.1) 0%, rgba(0,123,255,0) 70%);
+    border-radius: 50%;
+}
+
+/* Карточки мавпочок */
+.monkey-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.monkey-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.monkey-card .card-img-top {
+    height: 250px;
+    object-fit: cover;
+}
+
+/* Бейджі рідкості */
+.card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.card-badge.common {
+    background-color: #6c757d;
+    color: white;
+}
+
+.card-badge.rare {
+    background-color: #0dcaf0;
+    color: white;
+}
+
+.card-badge.epic {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.card-badge.legendary {
+    background-color: #ffc107;
+    color: black;
+}
+
+/* Ціна */
+.price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #6f42c1;
+}
+
+/* Анімації появи карток */
+.monkey-card-wrapper {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Кнопки */
+.btn-primary {
+    background: linear-gradient(45deg, #6f42c1, #007bff);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(111,66,193,0.4);
+}
+
+/* Фільтри */
+.filters select {
+    border-radius: 20px;
+    padding: 10px 20px;
+    border: 1px solid #e9ecef;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Пагінація */
+.pagination .page-link {
+    border-radius: 20px;
+    margin: 0 5px;
+    border: none;
+    color: #6f42c1;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #6f42c1;
+    color: white;
+}
+
+/* Кольори для статусів замовлення */
+.badge.bg-pending {
+    background-color: #ffc107 !important;
+    color: #000;
+}
+
+.badge.bg-processing {
+    background-color: #17a2b8 !important;
+    color: #fff;
+}
+
+.badge.bg-shipped {
+    background-color: #007bff !important;
+    color: #fff;
+}
+
+.badge.bg-delivered {
+    background-color: #28a745 !important;
+    color: #fff;
+}
+
+.badge.bg-cancelled {
+    background-color: #dc3545 !important;
+    color: #fff;
+}
